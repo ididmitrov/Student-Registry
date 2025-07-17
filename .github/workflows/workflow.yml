@@ -39,7 +39,7 @@ jobs:
       run: sleep 3
       
     - name: Run tests
-      run: npm test
+      run: npx mocha tests/*.js
       
     - name: Stop server
       run: pkill -f "node index.js"
