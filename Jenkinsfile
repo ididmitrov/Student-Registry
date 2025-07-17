@@ -3,8 +3,6 @@ pipeline {
 
     environment {
         NODE_VERSION = '18.x'
-        SERVICE_ID = 'render-service-id'
-        RENDER_API_KEY = 'render-api-key'
     }
 
     tools {
@@ -23,10 +21,8 @@ pipeline {
                 script {
                     if (isUnix()) {
                         sh 'npm install'
-                        sh 'npm install -g wait-on kill-port'
                     } else {
                         bat 'npm install'
-                        bat 'npm install -g wait-on kill-port'
                     }
                 }
             }
@@ -36,15 +32,9 @@ pipeline {
             steps {
                 script {
                     if (isUnix()) {
-                        sh 'npm start &'
-                        sh 'wait-on http://localhost:8090'
-                        sh 'npm test'
-                        sh 'kill-port 8090'
+                        sh 'node ./node_modules/mocha/bin/mocha tests/*.js'
                     } else {
-                        bat 'start /b npm run start'
-                        bat 'wait-on http://localhost:8090'
-                        bat 'npm test'
-                        bat 'kill-port 8090'
+                        bat 'node ./node_modules/mocha/bin/mocha tests/*.js'
                     }
                 }
             }
@@ -54,15 +44,6 @@ pipeline {
     post {
         always {
             echo 'CI Pipeline completed.'
-        }
-        failure {
-            script {
-                if (isUnix()) {
-                    sh 'kill-port 8090 || true'  // Ensure port killing doesn't fail
-                } else {
-                    bat 'kill-port 8090'
-                }
-            }
         }
     }
 }
